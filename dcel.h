@@ -79,11 +79,50 @@ namespace DCEL {
         queue.push_back(&vertexes[vertexes.size() - 1]);
     }
 
-    bool isAbove(const Vertex *v1, const Vertex *v2) {
-        return v1->y > v2->y;
+    bool isAboveNeighboors(const Vertex *current) {
+        const Vertex *prior = current->edgeIn->src;
+        const Vertex *next = current->edgeOut->tgt;
+        return (current->y > prior->y || (current->y == prior->y && current->x < prior->x)) && (current->y > next->y || (current->y == next->y && current->x < next->x));
     }
 
-    bool isBelow(const Vertex *v1, const Vertex *v2) {
-        return v1->y < v2->y;
+    bool isBelowNeighboors(const Vertex *current) {
+        const Vertex *prior = current->edgeIn->src;
+        const Vertex *next = current->edgeOut->tgt;
+        return (current->y < prior->y || (current->y == prior->y && current->x > prior->x)) && (current->y < next->y || (current->y == next->y && current->x > next->x));
     }
+
+    bool isConvex(const Vertex *current) {
+        const Vertex *prior = current->edgeIn->src;
+        const Vertex *next = current->edgeOut->tgt;
+        return (((prior->y - current->y) * next->x) + ((current->x - prior->x) * next->y) + (((prior->x * current->y) - (prior->y * current->x)))) >= 0;
+    }
+
+    struct EdgeSortingFunctor : std::binary_function<Edge*, Edge*, bool> {
+
+        private:
+            double m_scanline_y;
+
+        public:
+            inline EdgeSortingFunctor(double scanline_y) : m_scanline_y(scanline_y) {
+
+            }
+
+            inline bool operator () (const Edge *edge1, const Edge *edge2) const {
+                double x1;
+                if (edge1->src->y != edge1->tgt->y) {
+                    x1 = (((edge1->src->x - edge1->tgt->x) * m_scanline_y) - (edge1->src->x * edge1->tgt->y) + (edge1->src->y * edge1->tgt->x)) / (edge1->src->y - edge1->tgt->y);
+                } else {
+                    x1 = std::min(edge1->src->x, edge1->tgt->x);
+                }
+
+                double x2;
+                if (edge2->src->y != edge2->tgt->y) {
+                    x2 = (((edge2->src->x - edge2->tgt->x) * m_scanline_y) - (edge2->src->x * edge2->tgt->y) + (edge2->src->y * edge2->tgt->x)) / (edge2->src->y - edge2->tgt->y);
+                } else {
+                    x2 = std::min(edge2->src->x, edge2->tgt->x);
+                }
+                return (x1 > x2);
+            }
+    };
+
 }

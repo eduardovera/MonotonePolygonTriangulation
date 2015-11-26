@@ -6,6 +6,14 @@ using namespace std;
 
 namespace DCEL {
 
+    enum VertexType {
+        START_VERTEX_TYPE,
+        END_VERTEX_TYPE,
+        SPLIT_VERTEX_TYPE,
+        MERGE_VERTEX_TYPE,
+        REGULAR_VERTEX_TYPE
+    };
+
     struct Vertex;
     struct Edge;
 
@@ -13,6 +21,8 @@ namespace DCEL {
     struct Vertex {
         double x;
         double y;
+
+        VertexType type;
 
         int index;
 
@@ -23,21 +33,6 @@ namespace DCEL {
             this->x = x;
             this->y = y;
         }
-
-        inline bool operator < (const Vertex v) const {
-            if (y > v.y || (y == v.y && x > v.x)) {
-                return true;
-            }
-            return false;
-        }
-
-        inline bool operator < (const Vertex *v) const {
-            if (y > v->y || (y == v->y && x > v->x)) {
-                return true;
-            }
-            return false;
-        }
-
     };
 
     std::vector<Vertex> vertexes;
@@ -84,4 +79,11 @@ namespace DCEL {
         queue.push_back(&vertexes[vertexes.size() - 1]);
     }
 
+    bool isAbove(const Vertex *v1, const Vertex *v2) {
+        return v1->y > v2->y;
+    }
+
+    bool isBelow(const Vertex *v1, const Vertex *v2) {
+        return v1->y < v2->y;
+    }
 }

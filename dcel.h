@@ -41,6 +41,8 @@ namespace DCEL {
         Vertex *src;
         Vertex *tgt;
 
+        Vertex *helper;
+
         Edge() {}
 
         Edge(Vertex *src, Vertex *tgt) {
@@ -94,7 +96,11 @@ namespace DCEL {
     bool isConvex(const Vertex *current) {
         const Vertex *prior = current->edgeIn->src;
         const Vertex *next = current->edgeOut->tgt;
-        return (((prior->y - current->y) * next->x) + ((current->x - prior->x) * next->y) + (((prior->x * current->y) - (prior->y * current->x)))) >= 0;
+        return (((prior->y - current->y) * next->x) + ((current->x - prior->x) * next->y) + (((prior->x * current->y) - (prior->y * current->x)))) > 0;
+    }
+
+    bool isRight(Vertex *v1, Vertex *v2, Vertex *p) {
+        return ((v2->x - v1->x) * (p->y - v1->y) - (v2->y - v1->y) * (p->x - v1->x)) < 0.0;
     }
 
     struct EdgeSortingFunctor : std::binary_function<Edge*, Edge*, bool> {

@@ -8,8 +8,9 @@ CONFIG += c++11
 
 TEMPLATE = app
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    polypartition.cpp
 
 HEADERS += \
-    dcel.h
+    polypartition.h
 

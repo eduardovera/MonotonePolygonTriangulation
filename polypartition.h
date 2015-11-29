@@ -1,9 +1,6 @@
 #include <list>
 using namespace std;
 
-#define TPPL_CCW 1
-#define TPPL_CW -1
-
 //2D point structure
 struct Vertex {
 
@@ -16,78 +13,34 @@ struct Vertex {
 
     }
 
+    Vertex(double x, double y) {
+        this->x = x;
+        this->y = y;
+    }
+
     Vertex(double x, double y, int index) {
         this->x = x;
         this->y = y;
         this->index = index;
     }
-
-    Vertex operator + (const Vertex& p) const {
-        Vertex r;
-		r.x = x + p.x;
-		r.y = y + p.y;
-		return r;
-	}
-
-    Vertex operator - (const Vertex& p) const {
-        Vertex r;
-		r.x = x - p.x;
-		r.y = y - p.y;
-		return r;
-	}
-
-    Vertex operator * (const double f ) const {
-        Vertex r;
-		r.x = x*f;
-		r.y = y*f;
-		return r;
-	}
-
-    Vertex operator / (const double f ) const {
-        Vertex r;
-		r.x = x/f;
-		r.y = y/f;
-		return r;
-	}
-
-    bool operator==(const Vertex& p) const {
-		if((x == p.x)&&(y==p.y)) return true;
-		else return false;
-	}
-
-    bool operator!=(const Vertex& p) const {
-		if((x == p.x)&&(y==p.y)) return false;
-		else return true;
-	}
 };
 
 class Polygon {
     public:
 
         Vertex *points;
-        long numpoints;
-        bool hole;
-        //constructors/destructors
+        int numpoints;
+
         Polygon();
         ~Polygon();
 
         Polygon(const Polygon &src);
-        Polygon& operator=(const Polygon &src);
 
-        //getters and setters
-        long GetNumPoints() {
+        int GetNumPoints() {
             return numpoints;
         }
 
-        bool IsHole() {
-            return hole;
-        }
-
-        void SetHole(bool hole) {
-            this->hole = hole;
-        }
-
-        Vertex &GetPoint(long i) {
+        Vertex &GetPoint(int i) {
             return points[i];
         }
 
@@ -99,13 +52,10 @@ class Polygon {
             return points[i];
         }
 
-        //clears the polygon points
         void Clear();
 
-        //inits the polygon with numpoints vertices
-        void Init(long numpoints);
+        void Init(int numpoints);
 
-        //creates a triangle with points p1,p2,p3
         void Triangle(Vertex &p1, Vertex &p2, Vertex &p3);
 
 };
@@ -115,33 +65,30 @@ class PolygonPartition {
 
         struct MonotoneVertex {
             Vertex p;
-            long previous;
-            long next;
+            int previous;
+            int next;
         };
 
         class VertexSorter{
             MonotoneVertex *vertices;
             public:
                 VertexSorter(MonotoneVertex *v) : vertices(v) {}
-                bool operator() (long index1, long index2);
+                bool operator() (int index1, int index2);
         };
 
-        //edge that intersects the scanline
         struct ScanLineEdge {
-            long index;
+            int index;
             Vertex p1;
             Vertex p2;
 
-            //determines if the edge is to the left of another edge
             bool operator< (const ScanLineEdge & other) const;
 
             bool IsConvex(const Vertex& p1, const Vertex& p2, const Vertex& p3) const;
         };
 
-        //standard helper functions
         bool IsConvex(Vertex& p1, Vertex& p2, Vertex& p3);
         bool Below(Vertex &p1, Vertex &p2);
-        void AddDiagonal(MonotoneVertex *vertices, long *numvertices, long index1, long index2);
+        void AddDiagonal(MonotoneVertex *vertices, int *numvertices, int index1, int index2);
 
         int TriangulateMonotone(Polygon *inPoly, list<Polygon> *triangles);
 
